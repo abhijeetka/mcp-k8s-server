@@ -83,3 +83,31 @@ When using this client with LLMs, ensure that:
 - Proper access controls are in place for your Kubernetes cluster
 - The MCP server is running in a secure environment
 - API access is properly authenticated and authorized
+
+## Usage with Claude Desktop
+
+```
+{
+  "mcpServers": {
+    "kubernetes": {
+      "command": "npx",
+      "args": ["mcp-server-kubernetes"]
+    }
+  }
+}
+```
+
+## Contributing
+
+We welcome contributions to the MCP Kubernetes Server! If you'd like to contribute:
+
+1. Fork the repository
+2. Create a new branch for your feature (`git checkout -b feature/amazing-feature`)
+3. Make your changes
+4. Write or update tests as needed
+5. Commit your changes (`git commit -m 'Add some amazing feature'`)
+6. Push to your branch (`git push origin feature/amazing-feature`)
+7. Open a Pull Request
+
+
+For major changes, please open an issue first to discuss what you would like to change.
