@@ -68,12 +68,17 @@ When using this client with LLMs, ensure that:
 
 ```
 {
-  "mcpServers": {
-    "kubernetes": {
-      "command": "npx",
-      "args": ["mcp-server-kubernetes"]
+    "mcpServers": {
+        "Kubernetes": {
+            "command": "uv",
+            "args": [
+                "--directory",
+                "~/mcp/mcp-k8s-server",
+                "run",
+                "kubernetes.py"
+            ]
+        }
     }
-  }
 }
 ```
 
