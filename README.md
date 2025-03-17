@@ -1,6 +1,6 @@
-# MCP Kubernetes Client
+# MCP Kubernetes Server
 
-This is an MCP (Model Context Protocol) server for Kubernetes that provides programmatic control over Kubernetes clusters through simple API calls.
+This is an MCP (Model Context Protocol) server for Kubernetes that provides control over Kubernetes clusters through interactions with LLMs.
 
 ## Overview
 
@@ -13,26 +13,6 @@ Model Context Protocol (MCP) is a framework that enables Language Models to inte
 - Context management for operations
 - Tool discovery and documentation
 - Type-safe interactions between models and tools
-
-## Available Functions
-
-### Deployment Management
-
-#### `create_deployment(name: str, image: str, namespace: str = "default", replicas: int = 1)`
-Creates a new Kubernetes deployment.
-- **Parameters:**
-  - `name`: Name of the deployment
-  - `image`: Container image to deploy
-  - `namespace`: Kubernetes namespace (defaults to "default")
-  - `replicas`: Number of pod replicas (defaults to 1)
-
-#### `update_deployment(name: str, namespace: str = "default", replicas: int = None, image: str = None)`
-Updates an existing Kubernetes deployment.
-- **Parameters:**
-  - `name`: Name of the deployment to update
-  - `namespace`: Kubernetes namespace (defaults to "default")
-  - `replicas`: New number of replicas (optional)
-  - `image`: New container image (optional)
 
 ## Usage Examples
 
@@ -88,12 +68,17 @@ When using this client with LLMs, ensure that:
 
 ```
 {
-  "mcpServers": {
-    "kubernetes": {
-      "command": "npx",
-      "args": ["mcp-server-kubernetes"]
+    "mcpServers": {
+        "Kubernetes": {
+            "command": "uv",
+            "args": [
+                "--directory",
+                "~/mcp/mcp-k8s-server",
+                "run",
+                "kubernetes.py"
+            ]
+        }
     }
-  }
 }
 ```
 
