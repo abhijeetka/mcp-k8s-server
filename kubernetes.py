@@ -17,7 +17,7 @@ async def get_pods(namespace: str = "default") -> dict:
     """Get all pods in the specified namespace"""
     try:
         cmd = ["kubectl", "get", "pods", "-n", namespace, "-o", "json"]
-        result = subprocess.run(cmd, capture_output=True, text=True, check=True,env=env)
+        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
         return json.loads(result.stdout)
     except subprocess.CalledProcessError as e:
         return {"error": f"Failed to get pods: {str(e)}"}
@@ -26,8 +26,8 @@ async def get_pods(namespace: str = "default") -> dict:
 async def get_failing_pods(namespace: str = "default") -> dict:
     """Get all pods with issues in the specified namespace"""
     try:
-        cmd = ["kubectl", "get", "pods", "-n", namespace, "| grep -E 'CrashLoopBackOff|Error|Evicted|Failed|ErrImagePull|ImagePullBackOff'"]
-        result = subprocess.run(cmd, capture_output=True, text=True, check=True,env=env)
+        cmd = ["kubectl", "get", "pods", "-n", namespace, "--field-selector=status.phase!=Running", "-o", "json"]
+        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
         return json.loads(result.stdout)
     except subprocess.CalledProcessError as e:
         return {"error": f"Failed to get pods: {str(e)}"}
@@ -62,6 +62,125 @@ async def get_namespaces() -> dict:
         return json.loads(result.stdout)
     except subprocess.CalledProcessError as e:
         return {"error": f"Failed to get namespaces: {str(e)}"}
+    
+@mcp.tool()
+async def get_nodes() -> dict:
+    """Get all nodes in the cluster"""
+    try:
+        cmd = ["kubectl", "get", "nodes", "-o", "json"]
+        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        return json.loads(result.stdout)
+    except subprocess.CalledProcessError as e:
+        return {"error": f"Failed to get nodes: {str(e)}"}
+    
+@mcp.tool()
+async def get_deployments(namespace: str = "default") -> dict:
+    """Get all deployments in the specified namespace"""
+    try:
+        cmd = ["kubectl", "get", "deployments", "-n", namespace, "-o", "json"]
+        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        return json.loads(result.stdout)
+    except subprocess.CalledProcessError as e:
+        return {"error": f"Failed to get nodes: {str(e)}"}
+
+@mcp.tool()
+async def get_jobs(namespace: str = "default") -> dict:
+    """Get all jobs in the specified namespace"""
+    try:
+        cmd = ["kubectl", "get", "jobs", "-n", namespace, "-o", "json"]
+        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        return json.loads(result.stdout)
+    except subprocess.CalledProcessError as e:
+        return {"error": f"Failed to get jobs: {str(e)}"}
+
+
+@mcp.tool()
+async def get_cronjobs(namespace: str = "default") -> dict:
+    """Get all cronjobs in the specified namespace"""
+    try:
+        cmd = ["kubectl", "get", "cronjobs", "-n", namespace, "-o", "json"]
+        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        return json.loads(result.stdout)
+    except subprocess.CalledProcessError as e:
+        return {"error": f"Failed to get cronjobs: {str(e)}"}
+
+@mcp.tool()
+async def get_statefulsets(namespace: str = "default") -> dict:
+    """Get all statefulsets in the specified namespace"""
+    try:
+        cmd = ["kubectl", "get", "statefulsets", "-n", namespace, "-o", "json"]
+        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        return json.loads(result.stdout)
+    except subprocess.CalledProcessError as e:
+        return {"error": f"Failed to get statefulsets: {str(e)}"}
+    
+
+
+@mcp.tool()
+async def get_daemonsets(namespace: str = "default") -> dict:
+    """Get all daemonsets in the specified namespace"""
+    try:
+        cmd = ["kubectl", "get", "daemonsets", "-n", namespace, "-o", "json"]
+        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        return json.loads(result.stdout)
+    except subprocess.CalledProcessError as e:
+        return {"error": f"Failed to get daemonsets: {str(e)}"}
+
+
+@mcp.tool()
+async def expose_service(name: str, namespace: str = "default", type: str = "LoadBalancer", port: int = 80, target_port: int = 80) -> dict:
+    """Expose a service to the outside world"""
+    try:
+        cmd = ["kubectl", "expose", "service", name, "-n", namespace, "--type", type, "--port", str(port), "--target-port", str(target_port)]
+        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        return json.loads(result.stdout)
+    except subprocess.CalledProcessError as e:
+        return {"error": f"Failed to expose service: {str(e)}"}
+
+
+@mcp.tool()
+async def port_forward(name: str, namespace: str = "default", port: int = 80, target_port: int = 80) -> dict:
+    """Port forward a service to the outside world"""
+    try:
+        cmd = ["kubectl", "port-forward", "service", name, "-n", namespace, str(port), str(target_port)]
+        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        return json.loads(result.stdout)
+    except subprocess.CalledProcessError as e:
+        return {"error": f"Failed to port forward service: {str(e)}"}
+    
+
+
+@mcp.tool()
+async def get_logs(name: str, namespace: str = "default", tail: int = 1000) -> dict:
+    """Get the logs of a specific pod"""
+    try:
+        cmd = ["kubectl", "logs", name, "-n", namespace, "--tail", str(tail)]
+        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        return {"logs": result.stdout}
+    except subprocess.CalledProcessError as e:
+        return {"error": f"Failed to get logs: {str(e)}"}
+
+
+@mcp.tool()
+async def get_events(namespace: str = "default") -> dict:
+    """Get the events of a specific namespace"""
+    try:
+        cmd = ["kubectl", "get", "events", "-n", namespace, "-o", "json"]
+        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        return json.loads(result.stdout)
+    except subprocess.CalledProcessError as e:
+        return {"error": f"Failed to get events: {str(e)}"}
+
+   
+@mcp.tool()
+async def get_nodes(namespace: str = "default") -> dict:
+    """Get the nodes of a specific namespace"""
+    try:
+        cmd = ["kubectl", "get", "nodes", "-n", namespace, "-o", "json"]
+        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        return json.loads(result.stdout)
+    except subprocess.CalledProcessError as e:
+        return {"error": f"Failed to get nodes: {str(e)}"}
 
 @mcp.tool()
 async def create_deployment(name: str, image: str, namespace: str = "default", replicas: int = 1) -> dict:
@@ -131,14 +250,14 @@ async def update_deployment(name: str, namespace: str = "default", replicas: int
             cmd = ["kubectl", "scale", "deployment", name,
                   "--replicas", str(replicas),
                   "-n", namespace]
-            result = subprocess.run(cmd, capture_output=True, text=True, check=True, env=env)
+            result = subprocess.run(cmd, capture_output=True, text=True, check=True )
             updates.append(f"Scaled replicas to {replicas}")
             
         if image is not None:
             cmd = ["kubectl", "set", "image", f"deployment/{name}",
                   f"{name}={image}",
                   "-n", namespace]
-            result = subprocess.run(cmd, capture_output=True, text=True, check=True, env=env)
+            result = subprocess.run(cmd, capture_output=True, text=True, check=True )
             updates.append(f"Updated image to {image}")
             
         return {
