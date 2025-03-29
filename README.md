@@ -1,5 +1,7 @@
 # MCP Kubernetes Server
 
+![](https://badge.mcpx.dev?type=server 'MCP Server')
+
 This is an MCP (Model Context Protocol) server for Kubernetes that provides control over Kubernetes clusters through interactions with LLMs.
 
 ## Overview
@@ -52,7 +54,7 @@ Model Context Protocol (MCP) is a framework that enables Language Models to inte
 - delete service account.
 - create role.
 - delete role.
-- create role binding.
+- create role binding.a
 - delete role binding.
 
 ## LLM Integration
