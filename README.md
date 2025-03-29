@@ -28,6 +28,32 @@ Model Context Protocol (MCP) is a framework that enables Language Models to inte
 - Get me all cronjobs in the cluster.
 - Get me all statefulsets in the cluster.
 - Get me all daemonsets in the cluster.
+- What is the current context.
+- list all contexts.
+- switch to context <context-name>.
+- Get me the logs of pod <pod-name> in the production namespace.
+- Get me the events in the production namespace.
+- annotate pod <pod-name> with key1=value1 in the production namespace.
+- remove annotation key1 from pod <pod-name> in the production namespace.
+- add label key1=value1 to pod <pod-name> in the production namespace.
+- remove label key1 from pod <pod-name> in the production namespace.
+- expose deployment nginx-app in the production namespace on port 80.
+- port-forward pod,deployment,service with name <resource-name> in the production namespace to local port 8080.
+- delete pod, deployment, service, job, cronjob, statefulset, daemonset with name <resource-name> in the production namespace.
+
+## Upcoming Features
+- Create cluster role.
+- delete cluster role.
+- create cluster role binding.
+- delete cluster role binding.
+- create namespace.
+- delete namespace.
+- create service account.
+- delete service account.
+- create role.
+- delete role.
+- create role binding.
+- delete role binding.
 
 ## LLM Integration
 

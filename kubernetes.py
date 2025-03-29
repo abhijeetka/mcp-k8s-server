@@ -128,21 +128,26 @@ async def get_daemonsets(namespace: str = "default") -> dict:
 
 
 @mcp.tool()
-async def expose_service(name: str, namespace: str = "default", type: str = "LoadBalancer", port: int = 80, target_port: int = 80) -> dict:
-    """Expose a service to the outside world"""
+async def expose_service(k8s_object: str, name: str, namespace: str = "default", type: str = "ClusterIP", port: int = 80, target_port: int = 80, protocol: str = "TCP") -> dict:
+    """Expose a resource as a new kubernetes service
+       k8s_object can be pod (po), service (svc), replicationcontroller (rc), deployment (deploy), replicaset (rs)
+       Type for this service: ClusterIP, NodePort, LoadBalancer, or ExternalName. Default is 'ClusterIP'.
+    """
     try:
-        cmd = ["kubectl", "expose", "service", name, "-n", namespace, "--type", type, "--port", str(port), "--target-port", str(target_port)]
+        cmd = ["kubectl", "expose", k8s_object, name, "-n", namespace, "--type", type, "--port", str(port), "--target-port", str(target_port),"--protocol", protocol]
         result = subprocess.run(cmd, capture_output=True, text=True, check=True)
         return json.loads(result.stdout)
     except subprocess.CalledProcessError as e:
-        return {"error": f"Failed to expose service: {str(e)}"}
+        return {"error": f"Failed to expose : {str(e)}"}
 
 
 @mcp.tool()
-async def port_forward(name: str, namespace: str = "default", port: int = 80, target_port: int = 80) -> dict:
-    """Port forward a service to the outside world"""
+async def port_forward(k8s_object: str, name: str, namespace: str = "default", port: int = 80, target_port: int = 80) -> dict:
+    """Port forward a resource to the outside world
+        k8s_object can be a pod, deployment or a service and it should be in the format pod/<name>, deployment/<name>, service/<name>
+    """
     try:
-        cmd = ["kubectl", "port-forward", "service", name, "-n", namespace, str(port), str(target_port)]
+        cmd = ["kubectl", "port-forward", k8s_object, name, "-n", namespace, str(port), str(target_port)]
         result = subprocess.run(cmd, capture_output=True, text=True, check=True)
         return json.loads(result.stdout)
     except subprocess.CalledProcessError as e:
@@ -221,15 +226,92 @@ async def list_contexts() -> dict:
 
 
 @mcp.tool()
-async def use_context(context: str) -> dict:
-    """Use a specific Kubernetes context"""
+async def use_context(context_name: str) -> dict:
+    """Switch to a specific Kubernetes context
+    Args:
+        context_name: The name of the Kubernetes context to switch to
+    """
     try:
-        cmd = ["kubectl", "config", "use-context", context]
+        cmd = ["kubectl", "config", "use-context", context_name]
         result = subprocess.run(cmd, capture_output=True, text=True, check=True)
-        return {"message": f"Switched to context: {context}", 
+        return {"message": f"Switched to context: {context_name}",
                 "details": result.stdout}
     except subprocess.CalledProcessError as e:
         return {"error": f"Failed to switch context: {str(e)}"}
+
+@mcp.tool()
+async def annotate_resource(resource_type: str, resource_name: str, annotation: str, namespace: str = "default") -> dict:
+    """Annotate a Kubernetes resource with the specified annotation
+
+    Args:
+        resource_type: Type of the resource (e.g., pod, service, deployment)
+        resource_name: Name of the resource to annotate
+        annotation: Annotation to add (e.g., key=value)
+        namespace: Namespace of the resource
+    """
+    try:
+        cmd = ["kubectl", "annotate", resource_type, resource_name, annotation, "-n", namespace, "--overwrite"]
+        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        return {"message": f"Resource {resource_type}/{resource_name} annotated successfully in namespace {namespace}",
+                "details": result.stdout}
+    except subprocess.CalledProcessError as e:
+        return {"error": f"Failed to annotate resource: {str(e)}"}
+
+
+@mcp.tool()
+async def remove_annotation(resource_type: str, resource_name: str, annotation_key: str, namespace: str = "default") -> dict:
+    """Remove an annotation from a Kubernetes resource
+
+    Args:
+        resource_type: Type of the resource (e.g., pod, service, deployment)
+        resource_name: Name of the resource to remove the annotation from
+        annotation_key: Key of the annotation to remove
+        namespace: Namespace of the resource
+    """
+    try:
+        cmd = ["kubectl", "annotate", resource_type, resource_name, f"{annotation_key}-", "-n", namespace, "--overwrite"]
+        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        return {"message": f"Annotation {annotation_key} removed from resource {resource_type}/{resource_name} in namespace {namespace}",
+                "details": result.stdout}
+    except subprocess.CalledProcessError as e:
+        return {"error": f"Failed to remove annotation: {str(e)}"}
+
+@mcp.tool()
+async def label_resource(resource_type: str, resource_name: str, label: str, namespace: str = "default") -> dict:
+    """Label a Kubernetes resource with the specified label
+
+    Args:
+        resource_type: Type of the resource (e.g., pod, service, deployment)
+        resource_name: Name of the resource to label
+        label: Label to add (e.g., key=value)
+        namespace: Namespace of the resource
+    """
+    try:
+        cmd = ["kubectl", "label", resource_type, resource_name, label, "-n", namespace, "--overwrite"]
+        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        return {"message": f"Resource {resource_type}/{resource_name} labeled successfully in namespace {namespace}",
+                "details": result.stdout}
+    except subprocess.CalledProcessError as e:
+        return {"error": f"Failed to label resource: {str(e)}"}
+
+@mcp.tool()
+async def remove_label(resource_type: str, resource_name: str, label_key: str, namespace: str = "default") -> dict:
+    """Remove a label from a Kubernetes resource
+
+    Args:
+        resource_type: Type of the resource (e.g., pod, service, deployment)
+        resource_name: Name of the resource to remove the label from
+        label_key: Key of the label to remove
+        namespace: Namespace of the resource
+    """
+    try:
+        cmd = ["kubectl", "label", resource_type, resource_name, f"{label_key}-", "-n", namespace, "--overwrite"]
+        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        return {"message": f"Label {label_key} removed from resource {resource_type}/{resource_name} in namespace {namespace}",
+                "details": result.stdout}
+    except subprocess.CalledProcessError as e:
+        return {"error": f"Failed to remove label: {str(e)}"}
+
 
 @mcp.tool()
 async def update_deployment(name: str, namespace: str = "default", replicas: int = None, image: str = None) -> dict:
@@ -267,6 +349,24 @@ async def update_deployment(name: str, namespace: str = "default", replicas: int
         }
     except subprocess.CalledProcessError as e:
         return {"error": f"Failed to update deployment: {str(e)}"}
+
+@mcp.tool()
+async def delete_resource(resource_type: str, resource_name: str, namespace: str = "default") -> dict:
+    """Delete a Kubernetes resource
+
+    Args:
+        resource_type: Type of the resource (e.g., pod, service, deployment,configmap,secret,ingress,statefulset,replicaset,damonset,newtorkpolicy,rolebinding,role,serviceaccount,job,cronjob)
+        resource_name: Name of the resource to delete
+        namespace: Namespace of the resource
+    """
+    try:
+        cmd = ["kubectl", "delete", resource_type, resource_name, "-n", namespace]
+        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        return {"message": f"Resource {resource_type}/{resource_name} deleted successfully in namespace {namespace}",
+                "details": result.stdout}
+    except subprocess.CalledProcessError as e:
+        return {"error": f"Failed to delete resource: {str(e)}"}
+
 
 if __name__ == "__main__":
     try:
