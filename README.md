@@ -1,6 +1,7 @@
 # MCP Kubernetes Server
 
 ![](https://badge.mcpx.dev?type=server 'MCP Server')
+[![smithery badge](https://smithery.ai/badge/@abhijeetka/mcp-k8s-server)](https://smithery.ai/server/@abhijeetka/mcp-k8s-server)
 
 This is an MCP (Model Context Protocol) server for Kubernetes that provides control over Kubernetes clusters through interactions with LLMs.
 
@@ -124,3 +125,10 @@ We welcome contributions to the MCP Kubernetes Server! If you'd like to contribu
 
 
 For major changes, please open an issue first to discuss what you would like to change.
+### Installing via Smithery
+
+To install Kubernetes Server for Claude Desktop automatically via [Smithery](https://smithery.ai/server/@abhijeetka/mcp-k8s-server):
+
+```bash
+npx -y @smithery/cli install @abhijeetka/mcp-k8s-server --client claude
+```
